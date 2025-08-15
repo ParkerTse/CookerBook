@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        color: #da0b0bf1;
+        text-align: center;
+        margin-top: 30px;
+      }
+      form {
+        max-width: 400px;
+        margin: 20px auto;
+        display: flex;
+        gap: 10px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+      button {
+        background: #da0b0bf1;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #dc5b5b;
+      }
+      #recipes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+      .recipe-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 15px;
+      }
+      .recipe-card h2 {
+        color: #d35400;
+        margin-top: 0;
+      }
+      .recipe-card img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+    </style>
+    <title>All Recipes</title>
+  </head>
+  <body>
+    <h1>All Recipes</h1>
+    <form method="get" style="margin-bottom: 20px">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search recipes..."
+        value="{{ request.GET.q }}"
+      />
+      <button type="submit">Search</button>
+    </form>
+    <div id="recipes">
+      {% for recipe in recipes %}
+      <div class="recipe-card">
+        <h2>{{ recipe.title }}</h2>
+        <p><strong>By:</strong> {{ recipe.author }}</p>
+        <h3>Ingredients</h3>
+        <p>{{ recipe.ingredients }}</p>
+        <h3>Instructions</h3>
+        <p>{{ recipe.instructions }}</p>
+        {% if recipe.image %}
+        <img src="{{ recipe.image }}" alt="Recipe Image" width="200" />
+        {% endif %}
+      </div>
+      {% empty %}
+      <p>No recipes found.</p>
+      {% endfor %}
+    </div>
+  </body>
+</html>

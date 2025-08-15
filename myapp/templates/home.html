@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        color: #da0b0bf1;
+        text-align: center;
+        margin-top: 30px;
+      }
+      nav ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+      nav li {
+        display: inline;
+      }
+      nav a {
+        text-decoration: none;
+        color: #2c3e50;
+        font-weight: bold;
+        padding: 8px 16px;
+        border-radius: 4px;
+      }
+      nav a:hover {
+        background: #f1d4d4;
+        color: #da0b0bf1;
+      }
+    </style>
+  </head>
+  <body>
+    {% if user.is_authenticated %}
+    <div
+      style="
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      "
+    >
+      <img
+        src="{{ user.profile.picture.url|default:'/static/default-profile.png' }}"
+        alt="Profile"
+        style="
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #d35400;
+        "
+      />
+      <span style="font-weight: bold; color: #d35400">{{ user.email }}</span>
+    </div>
+    {% endif %}
+    <h1>CookerBook</h1>
+    <nav>
+      <ul>
+        <li><a href="/recipes/">Recipes</a></li>
+        <li><a href="/post/">Post</a></li>
+        <li><a href="/profile/">Profile</a></li>
+        <li><a href="/login/">Login</a></li>
+      </ul>
+    </nav>
+  </body>
+</html>
