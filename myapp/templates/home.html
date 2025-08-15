@@ -61,6 +61,26 @@
         "
       />
       <span style="font-weight: bold; color: #d35400">{{ user.email }}</span>
+      <form
+        method="post"
+        action="/logout/"
+        style="display: inline; margin-left: 10px"
+      >
+        {% csrf_token %}
+        <button
+          type="submit"
+          style="
+            background: #da0b0bf1;
+            color: #fff;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          "
+        >
+          Logout
+        </button>
+      </form>
     </div>
     {% endif %}
     <h1>CookerBook</h1>

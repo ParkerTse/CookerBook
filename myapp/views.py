@@ -1,40 +1,18 @@
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-def register_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
-        else:
-            user = User.objects.create_user(username=username, password=password)
-            login(request, user)
-            return redirect('home')
-    return render(request, 'register.html')
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import redirect
 from django.contrib import messages
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, 'Invalid username or password')
-    return render(request, 'login.html')
+from django.db import IntegrityError
+from .models import Recipe, UserEmail
+from .forms import RecipeForm
+import base64
+from django.core.files.base import ContentFile
 
-def logout_view(request):
-    logout(request)
-    return redirect('home')
-from django.shortcuts import render
-from .models import Recipe
 
 def home(request):
     return render(request, 'home.html')
 
-# Create your views here.
+
 def recipes(request):
     query = request.GET.get('q', '')
     if query:
@@ -43,7 +21,6 @@ def recipes(request):
         all_recipes = Recipe.objects.all()
     return render(request, 'recipes.html', {'recipes': all_recipes})
 
-from .forms import RecipeForm
 
 def post(request):
     if request.method == 'POST':
@@ -55,7 +32,74 @@ def post(request):
         form = RecipeForm()
     return render(request, 'post.html', {'form': form})
 
+
 def profile(request):
     return render(request, 'profile.html')
-	
 
+
+def register_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        # Check if email already exists
+        if UserEmail.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists')
+            return render(request, 'register.html')
+        
+        try:
+            # Create user with email as username (Django requires unique usernames)
+            # We'll use email as both username and email
+            user = User.objects.create_user(
+                username=email,  # Use email as username
+                email=email,
+                password=password
+            )
+            
+            # Create UserEmail record
+            UserEmail.objects.create(user=user, email=email)
+            
+            # Log the user in
+            login(request, user)
+            messages.success(request, 'Account created successfully!')
+            return redirect('home')
+            
+        except IntegrityError:
+            messages.error(request, 'An account with this email already exists')
+            return render(request, 'register.html')
+        except Exception as e:
+            messages.error(request, 'An error occurred while creating your account')
+            return render(request, 'register.html')
+    
+    return render(request, 'register.html')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        try:
+            # Find user by email
+            user_email = UserEmail.objects.get(email=email)
+            user = user_email.user
+            
+            # Authenticate using username (which is the email)
+            authenticated_user = authenticate(request, username=user.username, password=password)
+            
+            if authenticated_user is not None:
+                login(request, authenticated_user)
+                return redirect('home')
+            else:
+                messages.error(request, 'Invalid email or password')
+        except UserEmail.DoesNotExist:
+            messages.error(request, 'No account found with this email')
+        except Exception as e:
+            messages.error(request, 'An error occurred during login')
+    
+    return render(request, 'login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
