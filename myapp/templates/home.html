@@ -88,9 +88,47 @@
       <ul>
         <li><a href="/recipes/">Recipes</a></li>
         <li><a href="/post/">Post</a></li>
-        <li><a href="/profile/">Profile</a></li>
+        <li>
+          {% if user.is_authenticated %}
+          <a href="/profile/" id="profile-link">Profile</a>
+          {% else %}
+          <a href="#" id="profile-link" onclick="showLoginMessage(event)"
+            >Profile</a
+          >
+          <div
+            id="login-message"
+            style="
+              display: none;
+              color: red;
+              font-size: 14px;
+              text-align: center;
+              margin-top: 4px;
+              position: absolute;
+              right: 30px;
+              top: 65px;
+              background: #fff;
+              border: 1px solid #d35400;
+              border-radius: 6px;
+              padding: 6px 12px;
+              z-index: 100;
+            "
+          >
+            You need to login first
+          </div>
+          {% endif %}
+        </li>
         <li><a href="/login/">Login</a></li>
       </ul>
     </nav>
+    <script>
+      function showLoginMessage(e) {
+        e.preventDefault();
+        var msg = document.getElementById("login-message");
+        msg.style.display = "block";
+        setTimeout(function () {
+          msg.style.display = "none";
+        }, 2000);
+      }
+    </script>
   </body>
 </html>

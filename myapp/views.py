@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db import IntegrityError
 from .models import Recipe, UserEmail
-from .forms import RecipeForm
+from .forms import RecipeForm, UsernameChangeForm
 import base64
 from django.core.files.base import ContentFile
 
@@ -26,7 +26,11 @@ def post(request):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            recipe = form.save(commit=False)
+            if request.user.is_authenticated:
+                recipe.author = request.user.username
+                recipe.created_by = request.user
+            recipe.save()
             return render(request, 'post.html', {'form': RecipeForm(), 'success': True})
     else:
         form = RecipeForm()
@@ -34,7 +38,21 @@ def post(request):
 
 
 def profile(request):
-    return render(request, 'profile.html')
+    if not request.user.is_authenticated:
+        messages.info(request, 'You need to login first to view your profile.')
+        return render(request, 'profile.html', {'show_login_message': True})
+    user = request.user
+    username_form = None
+    num_recipes = Recipe.objects.filter(created_by=user).count()
+    if request.method == 'POST':
+        username_form = UsernameChangeForm(request.POST, instance=user)
+        if username_form.is_valid():
+            username_form.save()
+            messages.success(request, 'Username updated successfully!')
+            return redirect('profile')
+    else:
+        username_form = UsernameChangeForm(instance=user)
+    return render(request, 'profile.html', {'username_form': username_form, 'num_recipes': num_recipes})
 
 
 def register_view(request):

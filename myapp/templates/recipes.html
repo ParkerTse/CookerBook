@@ -76,7 +76,11 @@
       {% for recipe in recipes %}
       <div class="recipe-card">
         <h2>{{ recipe.title }}</h2>
-        <p><strong>By:</strong> {{ recipe.author }}</p>
+        <p>
+          <strong>By:</strong>
+          {% if recipe.created_by %} {{ recipe.created_by.username }} {% else %}
+          {{ recipe.author }} {% endif %}
+        </p>
         <h3>Ingredients</h3>
         <p>{{ recipe.ingredients }}</p>
         <h3>Instructions</h3>

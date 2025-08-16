@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ['title', 'author', 'ingredients', 'instructions', 'image']
+        fields = ['title', 'ingredients', 'instructions', 'image']
 
 
 class EmailRegistrationForm(forms.Form):
@@ -65,3 +65,9 @@ class EmailLoginForm(forms.Form):
             'placeholder': 'Enter your password'
         })
     )
+
+
+class UsernameChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username']

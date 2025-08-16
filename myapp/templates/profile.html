@@ -35,9 +35,30 @@
   <body>
     <h1>Your Profile</h1>
     <div id="profile-info">
+      {% if show_login_message %}
+      <div class="error" style="color: red; text-align: center">
+        You need to login first to view your profile.
+      </div>
+      {% else %}
       <p><strong>Username:</strong> {{ user.username }}</p>
+      <form method="post" style="margin-bottom: 16px">
+        {% csrf_token %} {{ username_form.as_p }}
+        <button
+          type="submit"
+          style="
+            background: #da0b0bf1;
+            color: #fff;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          "
+        >
+          Change Username
+        </button>
+      </form>
       <p><strong>Email:</strong> {{ user.email }}</p>
-      <p><strong>Number of Recipes:</strong> 5</p>
+      <p><strong>Number of Recipes:</strong> {{ num_recipes }}</p>
       <form method="post" action="/logout/" style="margin-top: 20px">
         {% csrf_token %}
         <button
@@ -59,6 +80,7 @@
         alt="User Picture"
         width="100"
       />
+      {% endif %}
     </div>
   </body>
 </html>
